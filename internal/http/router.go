@@ -11,6 +11,7 @@ func NewRouter(h *Handler) http.Handler {
 	})
 
 	mux.HandleFunc("/links", h.LinkHandler)
+	mux.HandleFunc("/report", h.ReportHandler)
 
 	return mux
 }
