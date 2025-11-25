@@ -3,19 +3,18 @@ package http
 import (
 	"encoding/json"
 	"net/http"
-	"url_checker/internal/jobs"
+	"url_checker/internal/checker"
+	"url_checker/internal/model"
 	"url_checker/internal/repo"
 )
 
 type Handler struct {
 	repo repo.Repository
-	jobs *jobs.JobQueue
 }
 
-func NewHandler(r repo.Repository, j *jobs.JobQueue) *Handler {
+func NewHandler(r repo.Repository) *Handler {
 	return &Handler{
 		repo: r,
-		jobs: j,
 	}
 }
 
@@ -24,8 +23,8 @@ type LinksRequest struct {
 }
 
 type LinksResponse struct {
-	Links    []string `json:"links"`
-	LinksNum int64    `json:"links_num"`
+	Links    map[string]string `json:"links"`
+	LinksNum int64             `json:"links_num"`
 }
 
 func (h *Handler) LinkHandler(w http.ResponseWriter, r *http.Request) {
@@ -34,6 +33,7 @@ func (h *Handler) LinkHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Принимаем только POST", http.StatusBadRequest)
 		return
 	}
+
 	var req LinksRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "невалидный json", http.StatusBadRequest)
@@ -45,13 +45,25 @@ func (h *Handler) LinkHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	task := h.repo.CreateTask(req.Links)
+	result := make(map[string]string)
+	linkStructs := make([]model.LinkStruct, len(req.Links))
 
-	h.jobs.Submit(task.ID)
+	for i, url := range req.Links {
+		status := checker.CheckURL(url)
+
+		result[url] = status
+
+		linkStructs[i] = model.LinkStruct{
+			URL:     url,
+			Lstatus: model.LStatus(status),
+		}
+	}
+
+	task := h.repo.CreateTaskWithLinks(linkStructs)
 
 	resp := LinksResponse{
+		Links:    result,
 		LinksNum: task.ID,
-		Links:    req.Links,
 	}
 
 	w.Header().Set("Content-Type", "application/json")

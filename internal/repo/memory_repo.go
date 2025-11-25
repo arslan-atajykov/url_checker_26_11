@@ -52,3 +52,20 @@ func (r *MemoryRepo) UpdateTask(task model.Task) {
 	defer r.mu.Unlock()
 	r.tasks[task.ID] = task
 }
+
+func (r *MemoryRepo) CreateTaskWithLinks(links []model.LinkStruct) model.Task {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	r.counter++
+	id := r.counter
+
+	task := model.Task{
+		ID:         id,
+		Links:      links,
+		TaskStatus: model.TaskCompleted, // sync обработка завершена сразу
+	}
+
+	r.tasks[id] = task
+	return task
+}

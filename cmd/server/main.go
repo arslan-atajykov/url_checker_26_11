@@ -14,7 +14,7 @@ func main() {
 	jobQueue := jobs.NewJobQueue(repository, 100)
 	jobQueue.StartWorker()
 
-	handler := urlhttp.NewHandler(repository, jobQueue)
+	handler := urlhttp.NewHandler(repository)
 	router := urlhttp.NewRouter(handler)
 
 	log.Println("Сервер запущен на :8080")
