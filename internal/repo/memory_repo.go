@@ -27,7 +27,7 @@ func (r *MemoryRepo) CreateTask(urls []string) model.Task {
 	links := make([]model.LinkStruct, len(urls))
 
 	for i, url := range urls {
-		links[i] = model.LinkStruct{URL: url, Lstatus: model.StatusUnavailable}
+		links[i] = model.LinkStruct{URL: url, Lstatus: model.LStatus(model.StatusUnavailable)}
 	}
 
 	task := model.Task{
@@ -45,4 +45,10 @@ func (r *MemoryRepo) GetTask(id int64) (model.Task, bool) {
 
 	task, ok := r.tasks[id]
 	return task, ok
+}
+
+func (r *MemoryRepo) UpdateTask(task model.Task) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.tasks[task.ID] = task
 }

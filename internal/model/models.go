@@ -8,8 +8,8 @@ const (
 )
 
 type LinkStruct struct {
-	URL     string `json:"url"`
-	Lstatus string `json:"lstatus"`
+	URL     string  `json:"url"`
+	Lstatus LStatus `json:"lstatus"`
 }
 
 const (

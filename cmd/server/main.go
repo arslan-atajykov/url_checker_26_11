@@ -4,12 +4,17 @@ import (
 	"log"
 	"net/http"
 	urlhttp "url_checker/internal/http"
+	"url_checker/internal/jobs"
 	"url_checker/internal/repo"
 )
 
 func main() {
-	repo := repo.NewMemoryRepo()
-	handler := urlhttp.NewHandler(repo)
+	repository := repo.NewMemoryRepo()
+
+	jobQueue := jobs.NewJobQueue(repository, 100)
+	jobQueue.StartWorker()
+
+	handler := urlhttp.NewHandler(repository, jobQueue)
 	router := urlhttp.NewRouter(handler)
 
 	log.Println("Сервер запущен на :8080")
