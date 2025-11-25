@@ -1,17 +1,15 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
+	urlhttp "url_checker/internal/http"
 )
 
 func main() {
-	http.HandleFunc("/check", func(w http.ResponseWriter, r *http.Request) {
-		_, _ = fmt.Fprint(w, "OK")
-	})
+	router := urlhttp.NewRouter()
 	log.Println("Сервер запущен на :8080")
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	if err := http.ListenAndServe(":8080", router); err != nil {
 		log.Fatal(err)
 	}
 }
