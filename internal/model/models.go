@@ -13,6 +13,7 @@ type LinkStruct struct {
 }
 
 const (
+	TaskPending   string = "pending"
 	TaskRunning   string = "running"
 	TaskCompleted string = "completed"
 	TaskFailed    string = "failed"

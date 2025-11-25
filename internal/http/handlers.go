@@ -15,12 +15,12 @@ func NewHandler(r repo.Repository) *Handler {
 }
 
 type LinksRequest struct {
-	Links []string `json:"Links"`
+	Links []string `json:"links"`
 }
 
 type LinksResponse struct {
-	LinkId int64    `json:"Links_id"`
-	Links  []string `json:"Links"`
+	Links    map[string]string `json:"links"`
+	LinksNum int64             `json:"links_num"`
 }
 
 func (h *Handler) LinkHandler(w http.ResponseWriter, r *http.Request) {
@@ -42,9 +42,15 @@ func (h *Handler) LinkHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	task := h.repo.CreateTask(req.Links)
+	result := make(map[string]string)
+
+	for _, url := range req.Links {
+		status := CheckURL(url)
+		result[url] = status
+	}
 	resp := LinksResponse{
-		LinkId: task.ID,
-		Links:  req.Links,
+		Links:    result,
+		LinksNum: task.ID,
 	}
 	w.Header().Set("Content-Type", "application/json")
 	_ = json.NewEncoder(w).Encode(resp)

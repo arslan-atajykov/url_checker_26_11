@@ -33,7 +33,7 @@ func (r *MemoryRepo) CreateTask(urls []string) model.Task {
 	task := model.Task{
 		ID:         id,
 		Links:      links,
-		TaskStatus: model.TaskRunning,
+		TaskStatus: model.TaskPending,
 	}
 
 	r.tasks[id] = task
