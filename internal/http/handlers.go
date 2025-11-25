@@ -3,50 +3,49 @@ package http
 import (
 	"encoding/json"
 	"net/http"
-	"sync"
+	"url_checker/internal/repo"
 )
 
-var (
-	Counter int64
-	mu      sync.Mutex
-)
-
-type UrlsRequest struct {
-	Urls []string `json:"urls"`
+type Handler struct {
+	repo repo.Repository
 }
 
-type UrlsResponse struct {
-	UrlId int64    `json:"urls_id"`
-	Urls  []string `json:"urls"`
+func NewHandler(r repo.Repository) *Handler {
+	return &Handler{repo: r}
 }
 
-func UrlHandler(w http.ResponseWriter, r *http.Request) {
+type LinksRequest struct {
+	Links []string `json:"Links"`
+}
+
+type LinksResponse struct {
+	LinkId int64    `json:"Links_id"`
+	Links  []string `json:"Links"`
+}
+
+func (h *Handler) LinkHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Принимаем только POST", http.StatusBadRequest)
 		return
 	}
 
-	var req UrlsRequest
+	var req LinksRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "невалидный json", http.StatusBadRequest)
 		return
 	}
 
-	if len(req.Urls) == 0 {
-		http.Error(w, "отсутствуют urls", http.StatusBadRequest)
+	if len(req.Links) == 0 {
+		http.Error(w, "отсутствуют Links", http.StatusBadRequest)
 		return
 	}
 
-	mu.Lock()
-	Counter++
-	id := Counter
-	mu.Unlock()
-	resp := UrlsResponse{
-		UrlId: id,
-		Urls:  req.Urls,
+	task := h.repo.CreateTask(req.Links)
+	resp := LinksResponse{
+		LinkId: task.ID,
+		Links:  req.Links,
 	}
-
 	w.Header().Set("Content-Type", "application/json")
 	_ = json.NewEncoder(w).Encode(resp)
 

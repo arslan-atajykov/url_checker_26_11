@@ -2,7 +2,7 @@ package http
 
 import "net/http"
 
-func NewRouter() http.Handler {
+func NewRouter(h *Handler) http.Handler {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/check", func(w http.ResponseWriter, r *http.Request) {
@@ -10,7 +10,7 @@ func NewRouter() http.Handler {
 		_, _ = w.Write([]byte("ok"))
 	})
 
-	mux.HandleFunc("/urls", UrlHandler)
+	mux.HandleFunc("/links", h.LinkHandler)
 
 	return mux
 }
