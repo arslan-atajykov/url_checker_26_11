@@ -1,0 +1,33 @@
+{
+  "counter": 2,
+  "tasks": [
+    {
+      "id": 1,
+      "links": [
+        {
+          "url": "https://google.com",
+          "lstatus": "available"
+        },
+        {
+          "url": "https://bad.bad",
+          "lstatus": "not available"
+        }
+      ],
+      "task_status": "completed"
+    },
+    {
+      "id": 2,
+      "links": [
+        {
+          "url": "https://ya.ru",
+          "lstatus": "available"
+        },
+        {
+          "url": "https://invalid.domain",
+          "lstatus": "not available"
+        }
+      ],
+      "task_status": "completed"
+    }
+  ]
+}
